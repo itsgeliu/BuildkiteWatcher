@@ -1,0 +1,11 @@
+{
+  "name": "Buildkite watcher",
+  "description": "Show a notification when a build in buildkite goes green",
+  "version": "1.0",
+  "manifest_version": 3,
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [{ "matches": ["https://buildkite.com/*"], "js": ["content.js"] }],
+  "permissions": ["storage", "notifications", "activeTab", "declarativeContent", "tabs"]
+}
