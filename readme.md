@@ -1,4 +1,5 @@
 * Reason not using manifest v3
+
 Manifest v3 is using service worker instead of background pages in v2. Service worker is great except that (it terminates when idle and restarts when needed)[https://developer.chrome.com/docs/extensions/mv3/migrating_to_service_workers/]. In our case, we creat a MutationObserver in content script. It will fire the callback when the build comes to an end, whether passed, failed and canceled. But there is no way we can activate the service worker from content script if the service worker is inactive when the time comes. Hence, I fallback to Manifest v2.
 
 Thoughts: can the (chrome.alarms)[https://developer.chrome.com/docs/extensions/reference/alarms/] keep the service worker from being inactive?
@@ -24,6 +25,7 @@ notification.onclick = function() {
 ```
 
 * Further improvement
+
 Have a good look at the (permissions)[https://developer.chrome.com/docs/extensions/mv3/declare_permissions/] in the manifest.
 
 * Good learning resource
