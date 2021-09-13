@@ -15,6 +15,7 @@ chrome.runtime.onMessage.addListener((request) => {
       [canceledStateClassName]: 'canceled'
     }
 
+    // debug purpose
     // if ($build) {
     //   const classNames = $build.className.split(' ')
     //   let result = null

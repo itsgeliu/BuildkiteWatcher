@@ -46,18 +46,28 @@ chrome.runtime.onInstalled.addListener(() => {
 
   chrome.notifications.onClicked.addListener((notificationId) => {
     console.log(`clicked ${notificationId}`)
-    // notificationId has format `${commit}-${tabId}`
-    const tabId = notificationId.split('-')[1]
-
-    // Focus on the tab which initiated the notification
+    // `notificationId` has format `${commit}-${tabId}`
     // Note that parseInt is mandatory here.
     // Chrome extension has a strict data type check.
-    // Type coercion will result in an error.
+    // Passing string of number to a number parameter will result in an error.
+    const tabId = parseInt(notificationId.split('-')[1])
+
+    // Focus on the tab which initiated the notification
     chrome.tabs.update(parseInt(tabId), {
       active: true
-    }, () => {
-      // clear notification after user clicks on it
-      chrome.notifications.clear(notificationId)
+    }, (tab) => {
+      console.log(`windowId: ${tab.windowId}`)
+      // Chrome is a multi-window application hence we need to focus on the window as well
+      chrome.windows.update(tab.windowId, { focused: true }, () => {
+        chrome.notifications.clear(notificationId)
+      })
     })
+
+    // another solution:
+    // chrome.tabs.get(tabId, function(tab) {
+    //   chrome.tabs.highlight({ tabs: tab.index, windowId: tab.windowId }, () => {
+    //     chrome.notifications.clear(notificationId)
+    //   })
+    // })
   })
 })
