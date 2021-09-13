@@ -1,15 +1,12 @@
-console.log('log init')
-
 chrome.runtime.onInstalled.addListener(() => {
   chrome.tabs.onUpdated.addListener(
     function(tabId, changeInfo, tab) {
-      console.log('on update')
-      console.log(tabId)
+      console.log('background: on update')
 
       if (changeInfo.status === 'complete') {
-        console.log('on update completed')
+        console.log('background: on update completed')
         chrome.tabs.sendMessage(tabId, {
-          message: 'TabUpdated',
+          message: 'tab_updated',
           tabId
         })
       }
@@ -20,8 +17,23 @@ chrome.runtime.onInstalled.addListener(() => {
     if (request.message === 'build_completed') {
       console.log('build_completed message received:', request)
 
-      const iconUrl = request.result === 'passed' ? 'images/check-mark.png' : 'images/cross-mark.png'
-      const message = request.result === 'passed' ? 'Build has passed' : 'Build has failed'
+      const map = {
+        passed: {
+          iconUrl: 'images/check-mark.png',
+          message: 'Build has passed'
+        },
+        failed: {
+          iconUrl: 'images/cross-mark.png',
+          message: 'Build has failed'
+        },
+        canceled: {
+          iconUrl: 'images/exclamation-mark.png',
+          message: 'Build has canceled'
+        }
+      }
+
+      const { iconUrl, message } = map[request.result]
+
       chrome.notifications.create(`${request.commit}-${request.tabId}`, {
         message,
         title: request.branch,
