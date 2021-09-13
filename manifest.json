@@ -1,11 +1,12 @@
 {
   "name": "Buildkite watcher",
   "description": "Show a notification when a build in buildkite goes green",
-  "version": "1.0",
+  "version": "0.0.0.1",
   "manifest_version": 3,
   "background": {
     "service_worker": "background.js"
   },
   "content_scripts": [{ "matches": ["https://buildkite.com/*"], "js": ["content.js"] }],
-  "permissions": ["storage", "notifications", "activeTab", "declarativeContent", "tabs"]
+  "permissions": ["notifications", "activeTab", "tabs"],
+  "icons": { "16": "icon16.png", "48": "icon48.png", "128": "icon128.png" }
 }
