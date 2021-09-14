@@ -41,6 +41,9 @@ chrome.runtime.onInstalled.addListener(() => {
         iconUrl,
         requireInteraction: true
       })
+
+      const tone = new Audio('audio/finish-tone.wav')
+      tone.play()
     }
   })
 
