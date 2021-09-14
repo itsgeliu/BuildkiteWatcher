@@ -18,7 +18,7 @@
     body: 'Hey there! You\'ve been notified!',
     requireInteraction: true, // keep the notification long lasting
   });
-  notification.onclick = function() {
+  notification.onclick = () => {
     window.focus();
     notification.close();
   };
