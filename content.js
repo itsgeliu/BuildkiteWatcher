@@ -26,12 +26,14 @@ chrome.runtime.onMessage.addListener((request) => {
     //   })
 
     //   if (result) {
-    //     const commit = $build.querySelector('.commit a').innerText
     //     const branch = $build.querySelector('.branch a').innerText
+    //     const commit = $build.querySelector('.commit a').innerText
+    //     const buildId = $build.querySelector('.number').innerText.replace(/\D/g, '')
     //     chrome.runtime.sendMessage({
     //       message: 'build_completed',
     //       tabId: request.tabId,
     //       result,
+    //       buildId,
     //       commit,
     //       branch
     //     })
@@ -57,12 +59,14 @@ chrome.runtime.onMessage.addListener((request) => {
           })
 
           if (result) {
-            const commit = $build.querySelector('.commit a').innerText
             const branch = $build.querySelector('.branch a').innerText
+            const commit = $build.querySelector('.commit a').innerText
+            const buildId = $build.querySelector('.number').innerText.replace(/\D/g, '')
             chrome.runtime.sendMessage({
               message: 'build_completed',
               tabId: request.tabId,
               result,
+              buildId,
               commit,
               branch
             })

@@ -1,6 +1,6 @@
 {
   "name": "Buildkite watcher",
-  "description": "Show a notification when a build in buildkite goes green",
+  "description": "Show a notification when a build in buildkite finishes",
   "version": "0.0.0.1",
   "manifest_version": 2,
   "background": {

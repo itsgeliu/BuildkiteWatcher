@@ -1,37 +1,10 @@
-* Reason not using manifest v3
+## How to use
 
-  Manifest v3 is using service worker instead of background pages which is used in v2. Service worker is great except that [it terminates when idle and restarts when needed](https://developer.chrome.com/docs/extensions/mv3/migrating_to_service_workers/). In our case, we creat a MutationObserver in content script. It will fire the callback when the build comes to an end, whether it's passed, failed or canceled. But there is no way we can activate the service worker from content script if the service worker is inactive when the time comes. Hence, I fallback to Manifest v2.
+* Clone the repo to your local.
+* Open the Extension management page by navigating to `chrome://extensions`.
+* Enable Developer mode by clicking the toggle switch next to `Developer mode` at the top right corner.
+* Click the `Load unpacked` button and select the extension directory.
 
-  Thoughts: can the [chrome.alarms](https://developer.chrome.com/docs/extensions/reference/alarms/) keep the service worker from being inactive?
+Now you should see our `Buildkite watcher` in the extension list.
 
-  Can the [long-lived connections](https://developer.chrome.com/docs/extensions/mv3/messaging/#connect) help?
-
-  A great explanation of service worker being inactive [here](https://stackoverflow.com/questions/29741922/prevent-service-worker-from-automatically-stopping)
-
-* Another way to implement the notification
-
-  Instead of runnnig code directly in content script, we can [inject script](https://developer.chrome.com/docs/extensions/mv3/content_scripts/#functionality) into the web page. And use [Notification API](https://developer.mozilla.org/en-US/docs/Web/API/notification) to show notifications:
-
-  ```
-  const notification = new Notification('Notification title', {
-    icon: 'http://cdn.sstatic.net/stackexchange/img/logos/so/so-icon.png',
-    body: 'Hey there! You\'ve been notified!',
-    requireInteraction: true, // keep the notification long lasting
-  });
-  notification.onclick = function() {
-    window.focus();
-    notification.close();
-  };
-  ```
-
-* Further improvement
-
-  Have a good look at the [permissions](https://developer.chrome.com/docs/extensions/mv3/declare_permissions/) in the manifest.
-
-* Good learning resource
-
-  https://betterprogramming.pub/building-chrome-extensions-communicating-between-scripts-75e1dbf12bb7
-
-  https://medium.com/@divakarvenu/lets-create-a-simple-chrome-extension-to-interact-with-dom-7bed17a16f42
-
-  [Adding modules support](https://stackoverflow.com/questions/48104433/how-to-import-es6-modules-in-content-script-for-chrome-extension)
+Next you just open up a page for your being built commit. Leave the tab open and instead of waiting for the build you can carry on your work at hand. You will get notified once the build is done. Clicking on the notification will lead you to the very tab which initialised the build.

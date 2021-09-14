@@ -34,7 +34,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
       const { iconUrl, message } = map[request.result]
 
-      chrome.notifications.create(`${request.commit}-${request.tabId}`, {
+      chrome.notifications.create(`${request.buildId}-${request.tabId}`, {
         message,
         title: request.branch,
         type: 'basic',
@@ -46,7 +46,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
   chrome.notifications.onClicked.addListener((notificationId) => {
     console.log(`clicked ${notificationId}`)
-    // `notificationId` has format `${commit}-${tabId}`
+    // `notificationId` has format `${buildId}-${tabId}`
     // Note that parseInt is mandatory here.
     // Chrome extension has a strict data type check.
     // Passing string of number to a number parameter will result in an error.
