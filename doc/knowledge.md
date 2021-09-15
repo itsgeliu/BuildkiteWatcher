@@ -35,3 +35,9 @@
   https://medium.com/@divakarvenu/lets-create-a-simple-chrome-extension-to-interact-with-dom-7bed17a16f42
 
   [Adding modules support](https://stackoverflow.com/questions/48104433/how-to-import-es6-modules-in-content-script-for-chrome-extension)
+
+* Unchecked runtime.lastError: The message port closed before a response was received.
+
+  https://developer.chrome.com/extensions/runtime#event-onMessage
+
+  If you are sending a message to background.js and using onMessage to receive that message and perform an asynchronous action (like an ajax request), you must return true; in onMessage to keep the message port open while waiting for the callback to return. Otherwise the message port closes immediately before the ajax request can complete and invoke your callback.

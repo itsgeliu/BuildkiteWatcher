@@ -9,6 +9,8 @@ const resultMapping = {
 
 const getBuildInfo = ($build) => {
   return {
+    // We don't want non alphanumerical characters in the branch name
+    // 'cause the branch name is gonna be part of some IDs like notification ID and alarm ID.
     branch: btoa($build.querySelector('.branch a').innerText),
     commit: $build.querySelector('.commit a').innerText,
     buildId: $build.querySelector('.number').innerText.replace(/\D/g, '')
