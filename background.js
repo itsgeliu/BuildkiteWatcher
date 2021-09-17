@@ -1,7 +1,7 @@
 chrome.runtime.onInstalled.addListener(() => {
 
   chrome.tabs.onUpdated.addListener(
-    (tabId, changeInfo, tab) => {
+    (tabId, changeInfo) => {
 
       if (changeInfo.status === 'complete') {
 
@@ -106,11 +106,10 @@ chrome.runtime.onInstalled.addListener(() => {
 
   chrome.declarativeContent.onPageChanged.removeRules(undefined, () => {
     chrome.declarativeContent.onPageChanged.addRules([{
-        conditions: [new chrome.declarativeContent.PageStateMatcher({
-            pageUrl: { urlMatches: 'buildkite.com/' },
-        })
-        ],
-        actions: [new chrome.declarativeContent.ShowPageAction()]
-    }]);
-  });
+      conditions: [new chrome.declarativeContent.PageStateMatcher({
+        pageUrl: { urlMatches: 'buildkite.com/' },
+      })],
+      actions: [new chrome.declarativeContent.ShowPageAction()]
+    }])
+  })
 })

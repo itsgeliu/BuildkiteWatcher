@@ -43,19 +43,11 @@ chrome.runtime.onMessage.addListener((request) => {
     const { tabId } = request
 
     if ($build) {
-      let result = getResult($build)
+      let previousResult = getResult($build)
       const buildInfo = getBuildInfo($build)
 
-      if (result === 'pending') {
+      if (previousResult === 'pending') {
         chrome.runtime.sendMessage({ message: 'create_alarm', ...buildInfo, tabId})
-      } else {
-        // debug purpose
-        chrome.runtime.sendMessage({
-          message: 'build_completed',
-          tabId,
-          result,
-          ...buildInfo
-        })
       }
 
       const observer = new MutationObserver((records) => {
@@ -63,7 +55,7 @@ chrome.runtime.onMessage.addListener((request) => {
         const currentResult = getResult($build)
         const buildInfo = getBuildInfo($build)
 
-        if (result === 'pending') {
+        if (previousResult === 'pending') {
           if (currentResult !== 'pending') {
 
             // from building to built
@@ -81,7 +73,7 @@ chrome.runtime.onMessage.addListener((request) => {
           chrome.runtime.sendMessage({ message: 'create_alarm', ...buildInfo, tabId})
         }
 
-        result = currentResult
+        previousResult = currentResult
       })
       observer.observe($build, { attributes: true })
     }
