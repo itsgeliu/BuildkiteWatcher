@@ -38,36 +38,27 @@ const getResult = ($build) => {
 
 chrome.runtime.onMessage.addListener((request) => {
   if (request.message === 'tab_updated') {
-    console.log('tab_updated message received from backgroundjs')
 
     const $build = document.querySelector('.build-panel')
     const { tabId } = request
-
-    console.log($build)
 
     if ($build) {
       let result = getResult($build)
       const buildInfo = getBuildInfo($build)
 
       if (result === 'pending') {
-        console.log('creating an alarm')
         chrome.runtime.sendMessage({ message: 'create_alarm', ...buildInfo, tabId})
       } else {
         // debug purpose
-        // chrome.runtime.sendMessage({
-        //   message: 'build_completed',
-        //   tabId,
-        //   result,
-        //   ...buildInfo
-        // })
+        chrome.runtime.sendMessage({
+          message: 'build_completed',
+          tabId,
+          result,
+          ...buildInfo
+        })
       }
 
       const observer = new MutationObserver((records) => {
-        console.log('observer callback')
-        console.log(records)
-
-        console.log('now the $build')
-        console.log($build)
 
         const currentResult = getResult($build)
         const buildInfo = getBuildInfo($build)
@@ -86,8 +77,7 @@ chrome.runtime.onMessage.addListener((request) => {
             chrome.runtime.sendMessage({ message: 'clear_alarm', ...buildInfo, tabId})
           }
         } else {
-          // from built to building
-          console.log('creating an alarm')
+          // from built to building (most likely user clicked `retry`)
           chrome.runtime.sendMessage({ message: 'create_alarm', ...buildInfo, tabId})
         }
 

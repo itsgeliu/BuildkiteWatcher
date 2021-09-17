@@ -1,10 +1,11 @@
 chrome.runtime.onInstalled.addListener(() => {
+
   chrome.tabs.onUpdated.addListener(
     (tabId, changeInfo, tab) => {
-      console.log('background: on update')
 
       if (changeInfo.status === 'complete') {
-        console.log('background: on update completed')
+
+        // There ought to be only one alarm for each tab
         if (alarmReferences[tabId]) {
           chrome.alarms.clear(alarmReferences[tabId])
           delete alarmReferences[tabId]
@@ -21,7 +22,6 @@ chrome.runtime.onInstalled.addListener(() => {
 
   chrome.runtime.onMessage.addListener((request) => {
     if (request.message === 'build_completed') {
-      console.log('build_completed message received:', request)
 
       const map = {
         passed: {
@@ -54,11 +54,14 @@ chrome.runtime.onInstalled.addListener(() => {
       const tone = new Audio(audio)
       tone.play()
     } else if (request.message === 'create_alarm') {
-      console.log('creating an alarm')
       const { buildId, branch, tabId } = request
       const alarmName = `${buildId}-${branch}-${tabId}`
-      chrome.alarms.create(alarmName, { delayInMinutes: 35 })
-      alarmReferences[tabId] = alarmName
+      chrome.storage.sync.get('thresholdInMinutes', ({ thresholdInMinutes: delayInMinutes }) => {
+        if (delayInMinutes > 0) {
+          chrome.alarms.create(alarmName, { delayInMinutes })
+          alarmReferences[tabId] = alarmName
+        }
+      })
     } else if (request.message === 'clear_alarm') {
       const { buildId, branch, tabId } = request
       const alarmName = `${buildId}-${branch}-${tabId}`
@@ -68,7 +71,6 @@ chrome.runtime.onInstalled.addListener(() => {
   })
 
   chrome.notifications.onClicked.addListener((notificationId) => {
-    console.log(`clicked ${notificationId}`)
     // `notificationId` has format `${buildId}-${tabId}`
     // Note that parseInt is mandatory here.
     // Chrome extension has a strict data type check.
@@ -87,7 +89,6 @@ chrome.runtime.onInstalled.addListener(() => {
   })
 
   chrome.alarms.onAlarm.addListener((alarm) => {
-    console.log('alarm triggered')
     const [buildId, branch, tabId] = alarm.name.split('-')
     chrome.notifications.create(`${buildId}-${tabId}`, {
       message: 'Build timed out',
@@ -100,4 +101,16 @@ chrome.runtime.onInstalled.addListener(() => {
     const tone = new Audio('audio/timedout.mp3')
     tone.play()
   })
+
+  chrome.storage.sync.set({ thresholdInMinutes: 35 })
+
+  chrome.declarativeContent.onPageChanged.removeRules(undefined, () => {
+    chrome.declarativeContent.onPageChanged.addRules([{
+        conditions: [new chrome.declarativeContent.PageStateMatcher({
+            pageUrl: { urlMatches: 'buildkite.com/' },
+        })
+        ],
+        actions: [new chrome.declarativeContent.ShowPageAction()]
+    }]);
+  });
 })

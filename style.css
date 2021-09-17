@@ -1,0 +1,20 @@
+.input-container {
+  min-width: 300px;
+  box-sizing: border-box;
+  padding: 10px;
+}
+
+.input-container label {
+  font-size: 15px;
+}
+
+.input-container p {
+  color: darkgreen;
+}
+
+input[name=threshouldInMinutes] {
+  margin-top: 8px;
+  box-sizing: border-box;
+  width:100%;
+  font-size: 15px;
+}

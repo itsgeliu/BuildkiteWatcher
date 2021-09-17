@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+
+  <div class="input-container">
+    <label for="threshouldInMinutes">Max waiting time in minutes</label>
+    <input
+      id="threshouldInMinutes"
+      type="number"
+      name="threshouldInMinutes"
+      min="0"
+      max="10000"
+      placeholder="Input 0 if you don't want time-out alert"
+    />
+    <p>Auto save. Refresh the existing pages to take effect.</p>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
