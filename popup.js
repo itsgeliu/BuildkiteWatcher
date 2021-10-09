@@ -1,12 +1,12 @@
 window.onload = () => {
 
-  const $thresholdInput = document.querySelector('[name=threshouldInMinutes]')
+  const $thresholdInput = document.querySelector('[name=thresholdInMinutes]')
 
   chrome.storage.sync.get('thresholdInMinutes', ({ thresholdInMinutes }) => {
     $thresholdInput.value = thresholdInMinutes
   })
 
-  document.querySelector('[name=threshouldInMinutes]').addEventListener('input', (e) => {
+  document.querySelector('[name=thresholdInMinutes]').addEventListener('input', (e) => {
     const newThreshold = parseFloat(e.target.value)
 
     if (!isNaN(newThreshold)) {
