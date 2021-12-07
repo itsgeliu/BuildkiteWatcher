@@ -38,6 +38,11 @@ chrome.runtime.onInstalled.addListener(() => {
           iconUrl: 'images/exclamation-mark.png',
           message: 'Build has canceled',
           audio: 'audio/canceled.mp3'
+        },
+        blocked: {
+          iconUrl: 'images/paused-mark.png',
+          message: 'Build is blocked',
+          audio: 'audio/blocked.mp3'
         }
       }
 
@@ -102,7 +107,7 @@ chrome.runtime.onInstalled.addListener(() => {
     tone.play()
   })
 
-  chrome.storage.sync.set({ thresholdInMinutes: 35 })
+  chrome.storage.sync.set({ thresholdInMinutes: 35, autoBypassBlockedSteps: false })
 
   chrome.declarativeContent.onPageChanged.removeRules(undefined, () => {
     chrome.declarativeContent.onPageChanged.addRules([{

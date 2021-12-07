@@ -1,10 +1,27 @@
 const failedStateClassName = 'build-state-failed'
 const passedStateClassName = 'build-state-passed'
 const canceledStateClassName = 'build-state-canceled'
+const blockedStateClassName = 'build-state-blocked'
 const resultMapping = {
   [failedStateClassName]: 'failed',
   [passedStateClassName]: 'passed',
-  [canceledStateClassName]: 'canceled'
+  [canceledStateClassName]: 'canceled',
+  [blockedStateClassName]: 'blocked'
+}
+
+const pendingResult = 'pending'
+const blockedResult = 'blocked'
+
+const getFromStorage = (key) => {
+  return new Promise((resolve, reject) => {
+    chrome.storage.sync.get(key, (data) => {
+      if (data.hasOwnProperty(key)) {
+        resolve(data[key])
+      } else {
+        reject(new Error(`Key ${key} not found in storage`))
+      }
+    })
+  })
 }
 
 const getBuildInfo = ($build) => {
@@ -26,7 +43,7 @@ const getBuildInfo = ($build) => {
  */
 const getResult = ($build) => {
   const classNames = $build.className.split(' ')
-  let result = 'pending'
+  let result = pendingResult
   Object.keys(resultMapping).forEach(state => {
     if (classNames.includes(state)) {
       result = resultMapping[state]
@@ -46,27 +63,50 @@ chrome.runtime.onMessage.addListener((request) => {
       let previousResult = getResult($build)
       const buildInfo = getBuildInfo($build)
 
-      if (previousResult === 'pending') {
+      if (previousResult === pendingResult) {
         chrome.runtime.sendMessage({ message: 'create_alarm', ...buildInfo, tabId})
       }
 
-      const observer = new MutationObserver((records) => {
+      const observer = new MutationObserver(async (records) => {
 
         const currentResult = getResult($build)
         const buildInfo = getBuildInfo($build)
 
-        if (previousResult === 'pending') {
-          if (currentResult !== 'pending') {
+        if (previousResult === pendingResult) {
 
-            // from building to built
-            chrome.runtime.sendMessage({
-              message: 'build_completed',
-              tabId: tabId,
-              result: currentResult,
-              ...buildInfo
-            })
+          // from building to built
+          // for simplicity, blocked state is regarded as a `completed` state
+          if (currentResult !== pendingResult) {
 
-            chrome.runtime.sendMessage({ message: 'clear_alarm', ...buildInfo, tabId})
+            const shouldBypassBlockedSteps = currentResult === blockedResult && await getFromStorage('autoBypassBlockedSteps')
+            let bypassedStepCount = 0
+            if (shouldBypassBlockedSteps) {
+              document.querySelectorAll('.build-pipeline-state-blocked').forEach(el => el.click())
+
+              await new Promise((resolve) => {
+                setTimeout(() => {
+                  document.querySelectorAll('.Dialog__Box').forEach(el => {
+                    el.querySelector('input[value="yes"]').click()
+                    el.querySelector('button[type="submit"]').click()
+                    bypassedStepCount += 1
+                  })
+                  resolve()
+                }, 3000)
+              })
+            }
+
+            // If shouldBypassBlockedSteps && bypassedStepCount === 0, it means we are unable to bypass the blocked steps.
+            // So we fall back to `complete` state and notify the user.
+            if (!shouldBypassBlockedSteps || bypassedStepCount === 0) {
+              chrome.runtime.sendMessage({
+                message: 'build_completed',
+                tabId: tabId,
+                result: currentResult,
+                ...buildInfo
+              })
+
+              chrome.runtime.sendMessage({ message: 'clear_alarm', ...buildInfo, tabId})
+            }
           }
         } else {
           // from built to building (most likely user clicked `retry`)
@@ -75,6 +115,7 @@ chrome.runtime.onMessage.addListener((request) => {
 
         previousResult = currentResult
       })
+
       observer.observe($build, { attributes: true })
     }
   }
